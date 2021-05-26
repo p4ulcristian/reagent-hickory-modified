@@ -10,9 +10,10 @@
   [style]
   {:pre  [(string? style)]
    :post [(even? (count %))]}
-  (->> (s/split style #";")
-       (mapcat #(s/split % #":"))
-       (map s/trim)))
+  (if-not (empty? style)
+    (->> (s/split style #";")
+      (mapcat #(s/split % #":"))
+      (map s/trim))))
 
 (defn tokens->map
   "Takes a seq of tokens with the properties (even) and their values (odd)
@@ -21,7 +22,7 @@
   {:pre  [(even? (count tokens))]
    :post [(map? %)]}
   (zipmap (keep-indexed #(if (even? %1) %2) tokens)
-          (keep-indexed #(if (odd? %1) %2) tokens)))
+    (keep-indexed #(if (odd? %1) %2) tokens)))
 
 (defn style->map
   "Takes an inline style attribute stirng and converts it to a React Style map"
@@ -32,9 +33,10 @@
   "Remove ng-* angular tags from hiccup data structure"
   [attrs]
   (->> attrs
-       (filter (fn [[key _]]
-                 (not (gstring/startsWith (name key) "ng-"))))
-       (into {})))
+    (filter (fn [[key _]]
+              (not (gstring/startsWith (name key) "ng-"))))
+    (into {})))
+
 
 (defn hiccup->sablono
   "Transforms a style inline attribute into a style map for React"
@@ -46,9 +48,10 @@
         x))
     (w/postwalk
       (fn [x]
-        (when-not (and (string? x)
-                       (or (re-matches #"\s+" x)
-                           (gstring/startsWith x "<!--")))
+        (if (and (string? x)
+              (or (re-matches #"\s+" x)
+                (gstring/startsWith x "<!--")))
+          x
           (if (map? x)
             (filter-angular
               (if (contains? x :style)
@@ -60,7 +63,10 @@
 (defn html->hiccup
   "translate html to hiccup captible with reagent"
   [html]
-  (->> (hc/parse-fragment html)
-       (map #(-> % hc/as-hiccup hiccup->sablono))
-       (filter identity)
-       first))
+  (try
+    (->> (hc/parse-fragment html)
+      (map #(-> % hc/as-hiccup hiccup->sablono))
+      (filter identity)
+      first)
+    (catch :default e
+      (.log js/console e))))
