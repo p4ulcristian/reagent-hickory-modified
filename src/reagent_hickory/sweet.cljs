@@ -21,7 +21,7 @@
   [tokens]
   {:pre  [(even? (count tokens))]
    :post [(map? %)]}
-  (zipmap (keep-indexed #(if (even? %1) %2) tokens)
+  (zipmap (keep-indexed #(if (even? %1) (keyword %2)) tokens)
     (keep-indexed #(if (odd? %1) %2) tokens)))
 
 (defn style->map
