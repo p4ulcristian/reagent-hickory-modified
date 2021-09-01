@@ -63,8 +63,9 @@
 (defn html->hiccup
   "translate html to hiccup captible with reagent"
   [html]
-   (println (->> (hc/parse-fragment html)
-             (map #(-> % hc/as-hiccup hiccup->sablono))))
+   (println "It's hickory bitches!!!: " 
+             (->> (hc/parse-fragment html)
+                  (map #(-> % hc/as-hiccup))))
   (try
     (->> (hc/parse-fragment html)
       (map #(-> % hc/as-hiccup hiccup->sablono))
