@@ -63,7 +63,8 @@
 (defn html->hiccup
   "translate html to hiccup captible with reagent"
   [html]
-  (println (hc/parse-fragment html))
+   (println (->> (hc/parse-fragment html)
+             (map #(-> % hc/as-hiccup hiccup->sablono))))
   (try
     (->> (hc/parse-fragment html)
       (map #(-> % hc/as-hiccup hiccup->sablono))
