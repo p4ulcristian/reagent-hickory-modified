@@ -70,7 +70,7 @@
   (as-hiccup [this] (condp = (aget this "nodeType")
                       Attribute [(utils/lower-case-keyword (aget this "name"))
                                  (aget this "value")]
-                      Comment (str "<!--" (aget this "data") "-->")
+                      Comment  nil
                       Document (map as-hiccup (aget this "childNodes"))
                       DocumentType (format-doctype this)
                       ;; There is an issue with the hiccup format, which is that it
